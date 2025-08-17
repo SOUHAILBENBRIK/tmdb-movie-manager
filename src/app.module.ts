@@ -25,6 +25,7 @@ import { TmdbModule } from './tmdb/tmdb.module';
     MoviesModule,
     GenresModule,
     TmdbModule,
+    SeedModule,
   ],
 })
 export class AppModule {}
