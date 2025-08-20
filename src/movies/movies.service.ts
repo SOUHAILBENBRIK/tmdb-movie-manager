@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   Injectable,
   NotFoundException,
@@ -197,16 +198,17 @@ export class MoviesService {
   }
 
   private async updateMovieRating(movieId: number): Promise<void> {
-    const result = await this.ratingRepository
-      .createQueryBuilder('rating')
-      .select('AVG(rating.rating)', 'avg')
-      .addSelect('COUNT(rating.id)', 'count')
-      .where('rating.movieId = :movieId', { movieId })
-      .getRawOne();
+    const result: { avg: string | null; count: string } | undefined =
+      await this.ratingRepository
+        .createQueryBuilder('rating')
+        .select('AVG(rating.rating)', 'avg')
+        .addSelect('COUNT(rating.id)', 'count')
+        .where('rating.movieId = :movieId', { movieId })
+        .getRawOne();
 
     await this.movieRepository.update(movieId, {
-      averageRating: parseFloat(result.avg) || 0,
-      ratingCount: parseInt(result.count) || 0,
+      averageRating: parseFloat(result?.avg ?? '0'),
+      ratingCount: parseInt(result?.count ?? '0'),
     });
   }
 }

@@ -1,4 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
@@ -34,7 +35,7 @@ interface TmdbGenreResponse {
 }
 
 @Injectable()
-export class TmdbService {
+export class TmdbService implements OnApplicationBootstrap {
   private readonly logger = new Logger(TmdbService.name);
   private readonly apiKey: string;
   private readonly baseUrl: string;
@@ -50,6 +51,19 @@ export class TmdbService {
       'TMDB_BASE_URL',
       'https://api.themoviedb.org/3',
     );
+  }
+
+  async onApplicationBootstrap() {
+    this.logger.log('Bootstrapping TMDB sync...');
+
+    // Run only on first launch or always depending on your needs
+    try {
+      await this.syncGenres();
+      await this.syncPopularMovies(5);
+      this.logger.log('Initial TMDB sync completed');
+    } catch (error) {
+      this.logger.error('Initial TMDB sync failed', error);
+    }
   }
 
   async syncGenres(): Promise<void> {
@@ -114,7 +128,6 @@ export class TmdbService {
             });
             totalMoviesSynced++;
           } catch (error) {
-            // Skip if movie already exists
             if (error.status !== 409) {
               this.logger.warn(
                 `Failed to create movie: ${movie.title}`,

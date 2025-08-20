@@ -15,6 +15,8 @@ npm run migration:generate -- src/migrations/init
 echo "Running migrations..."
 npm run migration:run
 
+echo "Building the app..."
+npm run build
 # Start the app and show logs
 echo "Starting the application..."
 npm run start:prod
