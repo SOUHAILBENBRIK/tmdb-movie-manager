@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
+  Inject,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
@@ -15,6 +16,8 @@ import { UpdateMovieDto } from './dto/update-movie.dto';
 import { CreateRatingDto } from './dto/create-rate.dto';
 import { CreateWatchlistDto } from './dto/create-watchlist.dto';
 import { MoviesFilterDto } from './dto/movie-filter.dto';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import type { Cache } from 'cache-manager';
 
 @Injectable()
 export class MoviesService {
@@ -27,6 +30,7 @@ export class MoviesService {
     private watchlistRepository: Repository<Watchlist>,
     @InjectRepository(Genre)
     private genreRepository: Repository<Genre>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async create(createMovieDto: CreateMovieDto): Promise<Movie> {
@@ -62,6 +66,15 @@ export class MoviesService {
       sortBy = 'createdAt',
       sortOrder = 'DESC',
     } = filterDto;
+    const cacheKey = `movies:${JSON.stringify(filterDto)}`;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    const cached = await this.cacheManager.get<{
+      movies: Movie[];
+      total: number;
+    }>(cacheKey);
+    if (cached) {
+      return cached;
+    }
 
     const queryBuilder: SelectQueryBuilder<Movie> = this.movieRepository
       .createQueryBuilder('movie')
@@ -92,6 +105,7 @@ export class MoviesService {
     queryBuilder.skip(skip).take(limit);
 
     const [movies, total] = await queryBuilder.getManyAndCount();
+    await this.cacheManager.set(cacheKey, { movies, total }, 60_000);
 
     return { movies, total };
   }

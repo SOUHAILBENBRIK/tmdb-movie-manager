@@ -2,18 +2,23 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
+  Inject,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Genre } from '../entities/genre.entity';
 import { CreateGenreDto } from './dto/create-genre.dto';
 import { UpdateGenreDto } from './dto/update-genre.dto';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import type { Cache } from 'cache-manager';
 
 @Injectable()
 export class GenresService {
   constructor(
     @InjectRepository(Genre)
     private genreRepository: Repository<Genre>,
+    @Inject(CACHE_MANAGER)
+    private cacheManager: Cache,
   ) {}
 
   async create(createGenreDto: CreateGenreDto): Promise<Genre> {
@@ -30,9 +35,17 @@ export class GenresService {
   }
 
   async findAll(): Promise<Genre[]> {
-    return this.genreRepository.find({
+    const cacheKey = `genres:all`;
+    const cached = await this.cacheManager.get<Genre[]>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    const genres = await this.genreRepository.find({
       relations: ['movies'],
     });
+    await this.cacheManager.set(cacheKey, genres, 60_000);
+    return genres;
   }
 
   async findOne(id: number): Promise<Genre> {
