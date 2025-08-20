@@ -1,98 +1,125 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 🎬 TMDB CRUD API (NestJS + MySQL + Redis)
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A scalable CRUD application built with **NestJS** that integrates with [The Movie Database (TMDB)](https://www.themoviedb.org/) APIs.  
+The app syncs movies and genres into a relational database, provides a REST API for CRUD operations, and implements caching for performance.  
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## ✨ Features
+- **Movies**
+  - CRUD endpoints
+  - Search, filtering, sorting, pagination
+  - Sync popular movies from TMDB
+  - Rate movies (with average rating calculation)
+  - Add/remove movies from a personal watchlist
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **Genres**
+  - CRUD endpoints
+  - Sync genres from TMDB
+  - Filter movies by genre
 
-## Project setup
+- **TMDB Integration**
+  - Initial sync of genres & popular movies on bootstrap
+  - Manual sync endpoints
+  - Search TMDB directly via API
 
+- **Caching**
+  - Redis caching for movies & genres queries
+
+- **Documentation**
+  - Swagger API documentation available at `/api` (when app is running)
+
+---
+
+## 🛠 Tech Stack
+- **Backend**: [NestJS](https://nestjs.com/) + TypeORM  
+- **Database**: MySQL 8 (via Docker)  
+- **Cache**: Redis 7 (via Docker)  
+- **Deployment**: Docker & Docker Compose  
+- **Testing**: Jest (unit tests)
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone the repository
 ```bash
-$ npm install
+git clone https://github.com/your-username/tmdb-crud-app.git
+cd tmdb-crud-app
 ```
 
-## Compile and run the project
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+### 2. Environment Variables
+Create a `.env` file in the root:
+```env
+TMDB_API_KEY=your_tmdb_api_key_here
 ```
 
-## Run tests
-
+### 3. Run with Docker
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+docker-compose up --build
 ```
 
-## Deployment
+The app will be available at:  
+👉 `http://localhost:8080/api`
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+Swagger docs:  
+👉 `http://localhost:8080/api-docs`
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+---
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+## 📂 Project Structure
+```
+src/
+  entities/         # Database entities (Movie, Genre, Rating, Watchlist)
+  movies/           # Movies module (controller, service, DTOs)
+  genres/           # Genres module
+  tmdb/             # TMDB sync + integration
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+---
 
-## Resources
+## 📖 API Highlights
 
-Check out a few resources that may come in handy when working with NestJS:
+### Movies
+- `POST /movies` → Create movie  
+- `GET /movies` → List movies (supports `search`, `genreIds`, `page`, `limit`, `sortBy`, `sortOrder`)  
+- `GET /movies/:id` → Get movie by ID  
+- `PATCH /movies/:id` → Update movie  
+- `DELETE /movies/:id` → Delete movie  
+- `POST /movies/rate` → Rate a movie  
+- `POST /movies/watchlist` → Add to watchlist  
+- `DELETE /movies/:id/watchlist/:userId` → Remove from watchlist  
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### Genres
+- `POST /genres` → Create genre  
+- `GET /genres` → List genres  
+- `GET /genres/:id` → Get genre  
+- `PATCH /genres/:id` → Update genre  
+- `DELETE /genres/:id` → Delete genre  
 
-## Support
+### TMDB
+- `POST /tmdb/sync/genres` → Sync genres from TMDB  
+- `POST /tmdb/sync/popular-movies?pages=5` → Sync N pages of popular movies  
+- `GET /tmdb/search?q=query` → Search TMDB movies  
+- `GET /tmdb/movie/:tmdbId` → Get TMDB movie details  
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+---
 
-## Stay in touch
+## 🧪 Testing
+Run tests with:
+```bash
+npm run test
+```
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+(Goal: ≥85% coverage)
 
-## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
+## 📌 Best Practices Followed
+- Clean architecture (NestJS modules, services, controllers, DTOs)
+- SOLID principles
+- Caching (Redis)
+- Production-ready Docker setup
+- Swagger API docs
+- Unit tests included
+
