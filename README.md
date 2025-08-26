@@ -44,8 +44,8 @@ The app syncs movies and genres into a relational database, provides a REST API 
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/your-username/tmdb-crud-app.git
-cd tmdb-crud-app
+git clone https://github.com/SOUHAILBENBRIK/tmdb-movie-manager.git
+cd tmdb-movie-manager
 ```
 
 ### 2. Environment Variables
